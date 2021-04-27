@@ -1,0 +1,32 @@
+## plate pre-processing pipeline walkthrough
+
+# When the data arrives from the HiSeq facility, it may be divided into many folders (one for each sample containing the data and a fastqc report)
+# Use "seq_gather.py" to assemble the seq files in one folder and the fastqc files in another. This is a small enough operation that it can be done directly, without sbatch.
+
+python3 seq_gather.py
+
+# Preliminary QC should be done here by checking the size of the .fastas and the size of the unsorted data files (sample files should be 10-100s of MB), and by checking the fastqc htmls for read quality. 
+# Next, we remove PCR duplicates with "dedup.py" and "dedup.slurm"
+# We will have to change the paths in .slurm (cd into directory with sequence files and call the python code from where it resides)
+# The deduplication should be done via sbatch on hummingbird
+
+sbatch dedup.slurm
+
+# Cleaning is done in the same manner (and requiring the same edits to the .slurm) as deduplificaton
+# For this, we have "clean_post_dedup.sh" which will be run using "clean_post_dedup.slurm"
+
+sbatch clean_post_dedup.slurm
+
+# Now we are ready to map, and again this is done through sbatch.
+# We use "mapping.py" through "mapping.slurm"
+
+sbatch mapping.slurm
+
+# Finally, to understand the coverage of our mapping, we run "coverage_calc.py" with "coverage_calc.slurm"
+# The python script will likely need to be modified based on the .sam file names (modify the regex in the line creating the ID list)
+
+sbatch coverage_calc.slurm
+
+# To tabulate the coverage data for easy assessment, "tabulate_coverage.py" can be run directly, but it must be located in the directory with the coverage output file and the path on line 27 will likely need to be changed (see the notes at the top of the script)
+
+python3 tabulate_coverage.py
