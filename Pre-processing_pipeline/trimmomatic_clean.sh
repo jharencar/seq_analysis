@@ -9,7 +9,7 @@
 #SBATCH --mail-type=END,FAIL              # Mail events (NONE, BEGIN, END, FAIL, ALL)
 #SBATCH --mail-user=jharenca@ucsc.edu  # Where to send mail
 #SBATCH -p 128x24   # Partition name
-#SBATCH --nodes=1                    
+#SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --array=[1-96]%3 # []%3 limits it so only 3 run in parallel at once
@@ -66,7 +66,3 @@ java -jar /hb/software/apps/trimmomatic/gnu-0.39/trimmomatic-0.39.jar PE -thread
 	ILLUMINACLIP:NexteraPE-PE.fa:2:30:10:2:keepBothReads LEADING:3 TRAILING:3
 
 echo "done!  └(^o^ )┘"
-
-
-## NOTES: Currently this is not removing the AR/BR oligos and needs to. I am pretty sure I can just add the AR and BR sequences to the "reference file" instead of the illumina adapters that seem to have already been removed with the barcodes during demultiplexing
-/hb/scratch/jharenca/vill_alle_plate1/newdata/whole_plate_mapping/trimmomatic_cleaned

@@ -12,15 +12,24 @@ python3 seq_gather.py
 
 sbatch dedup.slurm
 
-# Cleaning is done in the same manner (and requiring the same edits to the .slurm) as deduplificaton
-# For this, we have "clean_post_dedup.sh" which will be run using "clean_post_dedup.slurm"
+# Cleaning is done in almost the same manner (and requiring the same edits to the .slurm) as deduplificaton
+# For this, we have "trimmomatic_clean.sh"
+# This script runs the cleaning in an array for more efficient processing
 
-sbatch clean_post_dedup.slurm
+sbatch trimmomatic_clean.sh
 
-# Now we are ready to map, and again this is done through sbatch.
-# We use "mapping.py" through "mapping.slurm"
+# Now we are ready to map, and again this is done through an array script submitted through sbatch.
+# The bwa_mapping_paired.sh file needs the directory path updated to the folder with trimmed reads and an indexed reference genome and may also need edits to labels, like "library name"
+# For paired output from trimmomatic, we use
 
-sbatch mapping.slurm
+sbatch bwa_mapping_paired.sh
+
+#for the unpaired outpur from trimmomatic we use bwa_mapping_unpaired.sh
+# This also needs the path to the folder changed to be for the folder containing post trim fq.qzs and the reference genome and may need other label changes, like "library name"
+
+sbatch bwa_mapping_unpaired.sh
+
+############ 
 
 # Finally, to understand the coverage of our mapping, we run "coverage_calc.py" with "coverage_calc.slurm"
 # The python script will likely need to be modified based on the .sam file names (modify the regex in the line creating the ID list)
