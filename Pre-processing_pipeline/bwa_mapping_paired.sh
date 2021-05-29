@@ -14,7 +14,7 @@
 
 ##ARRAY NOTES: Tasks can mean multiple things, depending on context.
 ##(more info on arrays: https://support.ceci-hpc.be/doc/_contents/SubmittingJobs/SlurmFAQ.html)
-###Here, array over 3 nodes, 1 operations per node taking 24 cpus each (24 threads)
+###Here, array over 3 nodes, 1 operation per node taking 24 cpus each (24 threads)
 
 ##get bwa and samtools modules
 module load bwakit/bwa-0.7.15 samtools

@@ -1,0 +1,9 @@
+#ANGSD process notes
+
+#This begins with merged bams (merge the 2 unpaired and one paired bam per sample from the bwa mapping)
+
+#First create a list of the bams to be included in the run for example:
+
+ls -d /hb/scratch/jharenca/vill_alle_plate1/newdata/AVH_plate2/angsd_in/*VILL* /hb/scratch/jharenca/vill_alle_plate1/newdata/AVH_plate2/angsd_in/*ALLE* /hb/scratch/jharenca/vill_alle_plate1/newdata/AVH_plate2/angsd_in/*HYB* > AVH_p2_bam.filelist
+
+#place angsd.sh file for sbatch submission in directory with bamlist (I usually do it in the directory with the bams, but it isn't necessary with explicit paths as generated above)

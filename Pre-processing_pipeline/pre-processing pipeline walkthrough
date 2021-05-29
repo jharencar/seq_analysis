@@ -6,6 +6,7 @@
 python3 seq_gather.py
 
 # Preliminary QC should be done here by checking the size of the .fastas and the size of the unsorted data files (sample files should be 10-100s of MB), and by checking the fastqc htmls for read quality. 
+
 # Next, we remove PCR duplicates with "dedup.py" and "dedup.slurm"
 # We will have to change the paths in .slurm (cd into directory with sequence files and call the python code from where it resides)
 # The deduplication should be done via sbatch on hummingbird
@@ -24,18 +25,15 @@ sbatch trimmomatic_clean.sh
 
 sbatch bwa_mapping_paired.sh
 
-#for the unpaired outpur from trimmomatic we use bwa_mapping_unpaired.sh
+#for the unpaired output from trimmomatic we use bwa_mapping_unpaired.sh
 # This also needs the path to the folder changed to be for the folder containing post trim fq.qzs and the reference genome and may need other label changes, like "library name"
 
 sbatch bwa_mapping_unpaired.sh
 
+# next we merge the bams with samtools using the bam_merge.slurm script
+# remember to change the stated directory to the one containing all the .bam files and change the run name if needed. 
+# Note: there is a commented option for running as an array 
+
+sbatch bam_merge.slurm
+
 ############ 
-
-# Finally, to understand the coverage of our mapping, we run "coverage_calc.py" with "coverage_calc.slurm"
-# The python script will likely need to be modified based on the .sam file names (modify the regex in the line creating the ID list)
-
-sbatch coverage_calc.slurm
-
-# To tabulate the coverage data for easy assessment, "tabulate_coverage.py" can be run directly, but it must be located in the directory with the coverage output file and the path on line 27 will likely need to be changed (see the notes at the top of the script)
-
-python3 tabulate_coverage.py
