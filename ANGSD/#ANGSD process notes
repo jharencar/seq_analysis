@@ -6,4 +6,28 @@
 
 ls -d /hb/scratch/jharenca/vill_alle_plate1/newdata/AVH_plate2/angsd_in/*VILL* /hb/scratch/jharenca/vill_alle_plate1/newdata/AVH_plate2/angsd_in/*ALLE* /hb/scratch/jharenca/vill_alle_plate1/newdata/AVH_plate2/angsd_in/*HYB* > AVH_p2_bam.filelist
 
-#place angsd.sh file for sbatch submission in directory with bamlist (I usually do it in the directory with the bams, but it isn't necessary with explicit paths as generated above)
+#place angsd.sh file for sbatch submission in directory with bamlist (I usually do it in the directory with the bams, but it isn't necessary with explicit paths as generated above) see "AVHonly_ANGSD1_beagles.slurm" for a good example
+
+# Then run the code to generate the beagel genotype likelihood file
+sbatch AVHonly_ANGSD1_beagles.slurm
+
+# the beagle output file can then be used with NGSadmix and PCAngsd. See examples:
+
+AVH_p2_NGSadmix.slurm
+PCAngsd_AVH_p2.slurm
+
+# to generate the population label file from the bam list (first part only necessary if bamlist has absolute paths)
+
+cut -d "/" -f 9 AVH_p2_bam.filelist | cut -d "_" -f 1,2 > AVH_p2.pop.info
+
+# This file then needs to have the name (e.g. 19.588_VILL) split into two columns in the pop.info sheet. Can simply do this by converting the "_" to a " "
+
+sed -i 's/_/ /g' AVH_p2.pop.info
+
+#NOTE - tes it this way first so as not to overwrite the file incorrectly (check the output unsaved first)
+sed 's/_/ /g' AVH_p2.pop.info
+
+# for generating NGAadmix structure plots will need a poplabels file wich can be generated like this:
+
+cut -d " " -f 2 AVH_p2.pop.info > AVH_p2.poplabel
+
