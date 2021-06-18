@@ -20,27 +20,46 @@ Plot created from output of the following code:\
 `pcangsd.py -beagle $IN_DIR/p2_AVH.genolike.beagle.gz -o $OUT_DIR/AVH_p2_PCAngsd_IAF`
 
 
-```{r angsd1_AVH_PCA_IAF, echo=FALSE}
-
-pop <- read.table("angsd_out/AVH_only.pop.info")
-subpop <- read.table("angsd_out/AVH_only.subpop.info")
-cov <- as.matrix(read.table("angsd_out/PCAngsd/AVH_only_PCAngsd_IAF.cov"))
+```{r p2_angsd1_AVH_PCA_IAF, echo=FALSE}
+pop <- read.table("angsd_out/AVH_p2.pop.info")
+cov <- as.matrix(read.table("angsd_out/PCAngsd/AVH_p2_PCAngsd_IAF.cov"))
 e <- eigen(cov)
 
 PC1 <- e$vectors[,1]
 PC2 <- e$vectors[,2]
-spp <- pop[,1]
-spp.site <- subpop[,1]
-PC12.AVH.IAF <- data.frame(PC1, PC2, spp, spp.site)
+spp <- pop[,2]
+PC12.AVH.IAF <- data.frame(PC1, PC2, spp)
 
 library(ggplot2)
 ggplot(PC12.AVH.IAF, aes(x=PC1, y=PC2)) +
   geom_point(aes(color=factor(spp))) +
   ggtitle("AVH.IAF")
-
-ggplot(PC12.AVH.IAF, aes(x=PC1, y=PC2)) +
-  geom_point(aes(color=factor(spp.site))) +
-  ggtitle("AVH.IAF.w/site")
   
+```
+
+
+#### Admixture plot of plate 2 alle, vill, and hybrids only
+
+Plot created from output of the following code:\
+`NGSadmix -likes $IN_DIR/p2_AVH.genolike.beagle.gz -K 2 -P 48 -o $OUT_DIR/AVH_p2_NGSadmix_out -minMaf 0.05`
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.path = 'NGSadmix_figs/')
+knitr::opts_knit$set(root.dir = '/Users/juliaharencar/Google Drive (jharenca@ucsc.edu)/Costus/Seq_analysis/ANGSD')
+```
+```{r p2_angsd1_AVH_admixture, fig.width = 10, fig.height = 5, echo=FALSE}
+
+# Get ID and pop info for each individual
+pop<-scan("angsd_out/AVH_p2.poplabel", what="theFuck")
+
+# Read inferred admixture proportions file
+q<-read.table("angsd_out/NGSadmix/AVH_p2_NGSadmix_out.qopt")
+
+# Plot them (ordered by population)
+ord = order(pop)
+par(mar=c(7,4,1,1))
+barplot(t(q)[,ord],col=c("red","yellow"),names=pop[ord],las=2,ylab="AVH Admixture proportions",cex.names=0.75)
+#quartz.save("NGSadmix_figs/AVH_only_admixture_plot", type="png")
+
 ```
 
