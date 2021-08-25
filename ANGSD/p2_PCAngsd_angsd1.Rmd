@@ -50,7 +50,7 @@ knitr::opts_knit$set(root.dir = '/Users/juliaharencar/Google Drive (jharenca@ucs
 ```{r p2_angsd1_AVH_admixture, fig.width = 10, fig.height = 5, echo=FALSE}
 
 # Get ID and pop info for each individual
-pop<-scan("angsd_out/AVH_p2.poplabel", what="theFuck")
+pop<-scan("angsd_out/AVH_p2.poplabel", what="type")
 
 # Read inferred admixture proportions file
 q<-read.table("angsd_out/NGSadmix/AVH_p2_NGSadmix_out.qopt")

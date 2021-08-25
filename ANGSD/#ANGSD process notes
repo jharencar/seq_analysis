@@ -18,13 +18,13 @@ PCAngsd_AVH_p2.slurm
 
 # to generate the population label file from the bam list (first part only necessary if bamlist has absolute paths)
 
-cut -d "/" -f 9 AVH_p2_bam.filelist | cut -d "_" -f 1,2 > AVH_p2.pop.info
+cut -d "/" -f 9 AVH_only.clean.bam.filelist | cut -d "_" -f 1,2 > AVH_only.clean.pop.info
 
-# This file then needs to have the name (e.g. 19.588_VILL) split into two columns in the pop.info sheet. Can simply do this by converting the "_" to a " "
+# This file then needs to have the name (e.g. 19.588_VILL) split into two columns in the pop.info sheet. Can simply do this by converting the "_" to a " " (the -i flag makes this change immediately)
 
 sed -i 's/_/ /g' AVH_p2.pop.info
 
-#NOTE - tes it this way first so as not to overwrite the file incorrectly (check the output unsaved first)
+#NOTE - test it this way first so as not to overwrite the file incorrectly (check the output unsaved first)
 sed 's/_/ /g' AVH_p2.pop.info
 
 # for generating NGAadmix structure plots will need a poplabels file wich can be generated like this:

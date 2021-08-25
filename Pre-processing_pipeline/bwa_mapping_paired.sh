@@ -26,6 +26,7 @@ cd /hb/scratch/jharenca/vill_alle_plate1/newdata/AVH_plate2/trimmed
 NUMTHREADS=24
 LIBRARY_NAME="plate2"
 REF="C_lasius_ref.fa"
+
 # Set up array variables so that the same SLURM_ARRAY_TASK_ID references both input files for a given individual (F and R reads)
 R1=$(ls *_F_paired.fq.gz| sed -n ${SLURM_ARRAY_TASK_ID}p)
 R2=$(ls *_R_paired.fq.gz| sed -n ${SLURM_ARRAY_TASK_ID}p)

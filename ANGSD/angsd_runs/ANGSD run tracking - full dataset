@@ -1,0 +1,9 @@
+ANGSD run tracking - full dataset
+
+ANGSD1
+angsd -GL 1 -out genolike -nThreads 144 -doGlf 2 -doMajorMinor 1 -SNP_pval 1e-6 -doMaf 1 -minMapQ 30 -bam bam.filelist
+
+	AVH: Total number of sites analyzed: 1201995775; Number of sites retained after filtering: 23199178
+	AVHLG: Total number of sites analyzed: 1227164262; Number of sites retained after filtering: 38351271
+
+ANGSD2

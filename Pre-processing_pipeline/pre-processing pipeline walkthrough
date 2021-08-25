@@ -10,22 +10,26 @@ python3 seq_gather.py
 # Next, we remove PCR duplicates with "dedup.py" and "dedup.slurm"
 # We will have to change the paths in .slurm (cd into directory with sequence files and call the python code from where it resides)
 # The deduplication should be done via sbatch on hummingbird
+# utilizes clumpify.sh with dedup flag from bbtools
 
 sbatch dedup.slurm
 
-# Cleaning is done in almost the same manner (and requiring the same edits to the .slurm) as deduplificaton
-# For this, we have "trimmomatic_clean.sh"
+# Next, we clean/trim with trimmomatic_clean.sh, which removes adapters and reads less than 100bp (everything should be >150 based on size selection on the pooled libraries)
+# We will have to change the paths (cd into directory with sequence files and call the python code from where it resides)
+# The cleaning should be done via sbatch on hummingbird
 # This script runs the cleaning in an array for more efficient processing
+# utilizes trimmomatic
 
 sbatch trimmomatic_clean.sh
 
 # Now we are ready to map, and again this is done through an array script submitted through sbatch.
 # The bwa_mapping_paired.sh file needs the directory path updated to the folder with trimmed reads and an indexed reference genome and may also need edits to labels, like "library name"
 # For paired output from trimmomatic, we use
+# Utilizes bwa mem
 
 sbatch bwa_mapping_paired.sh
 
-#for the unpaired output from trimmomatic we use bwa_mapping_unpaired.sh
+# for the unpaired output from trimmomatic we use bwa_mapping_unpaired.sh
 # This also needs the path to the folder changed to be for the folder containing post trim fq.qzs and the reference genome and may need other label changes, like "library name"
 
 sbatch bwa_mapping_unpaired.sh
@@ -33,7 +37,17 @@ sbatch bwa_mapping_unpaired.sh
 # next we merge the bams with samtools using the bam_merge.slurm script
 # remember to change the stated directory to the one containing all the .bam files and change the run name if needed. 
 # Note: there is a commented option for running as an array 
+# utilizes samtools merge
 
 sbatch bam_merge.slurm
+
+##### BELOW NEEDS DETAILS/FIXING?
+# Next we remove duplicates again, this time including optical duplicates (mapping to exact same coordinates). We also filter out reads of less than 100bo, as all reads really should be >150 after size selection. 
+# Utilizes samtools sort/fixmate/markdups
+
+sbatch markdups_rm.sh
+
+# lastly, we can check out coverage with this array script.
+# utilizes samtools depth
 
 ############ 
