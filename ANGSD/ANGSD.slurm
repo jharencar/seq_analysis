@@ -31,8 +31,6 @@ angsd -GL 1 \ # -GL: Estimate genotype likelihoods. Options - 1: SAMtools 2: GAT
 -doMaf 1 \ # -minMaf remove sites with MAF below x (is MAF major or minor freq? must be minor... in which case it seems like a good idea to remove below .05 right? those are likely erroneous bp calls? WOuld be good to know how often this is even an issue in my data... )
 -bam bam.filelist
 
-#to run PCAngsd - local downlowad maybe? 
-
 #to run NGSadmix (located in the mics folder in angsd)
 # -K: number of clusters (i chose 17 because I have that many species in full plate, nice not to have to use Evanno...)
 # -P: number of threads

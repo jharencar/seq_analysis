@@ -42,12 +42,20 @@ sbatch bwa_mapping_unpaired.sh
 sbatch bam_merge.slurm
 
 ##### BELOW NEEDS DETAILS/FIXING?
-# Next we remove duplicates again, this time including optical duplicates (mapping to exact same coordinates). We also filter out reads of less than 100bo, as all reads really should be >150 after size selection. 
+# Next we filter out reads of less than 100bp, as all reads really should be >150 after size selection. 
+# we use samtools view and awk to do this. 
+# again, the script lilkely needs to be edited based on bam naming conventions and location
+
+sbatch remove_small_reads.sh
+
+# Next we remove duplicates again, this time including optical duplicates (mapping to exact same coordinates).
 # Utilizes samtools sort/fixmate/markdups
 
 sbatch markdups_rm.sh
 
 # lastly, we can check out coverage with this array script.
-# utilizes samtools depth
+# utilizes samtools depth and awk
+
+sbatch coverage_from_bams_array.sh
 
 ############ 
