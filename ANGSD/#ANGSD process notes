@@ -31,3 +31,7 @@ sed 's/_/ /g' AVH_p2.pop.info
 
 cut -d " " -f 2 AVH_p2.pop.info > AVH_p2.poplabel
 
+
+/hb/home/jharenca/pop_gen/ANGSD/angsd_in
+/hb/home/jharenca/pop_gen/ANGSD/NGSadmix_out
+/hb/home/jharenca/pop_gen/ANGSD/PCAngsd_out

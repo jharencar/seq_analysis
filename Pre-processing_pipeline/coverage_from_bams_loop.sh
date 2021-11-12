@@ -2,6 +2,7 @@
 #SBATCH --partition 128x24   
 #SBATCH --job-name=bam_coverage # Job name
 #SBATCH --time=24:00:00
+#SBATCH --mem=120G
 #SBATCH --output=bam_coverage_output.txt
 #SBATCH --nodes=1
 
@@ -9,10 +10,10 @@
 module load samtools/samtools-1.10
 
 ## change into the directory with .bams
-cd /hb/scratch/jharenca/pop_gen/combinedP1P2/merged_bams
+cd /hb/scratch/jharenca/pop_gen/combinedP1P2/temp_dedup/AVH_only
 
 # variable setting
-BAM_LIST=$(ls *.bam) # make list of file names to iterate through
+BAM_LIST=$(ls *clean.bam) # make list of file names to iterate through
 
 ## get depth and breadth of coverage
 

@@ -38,7 +38,7 @@ ggplot(PC12.AVH.full, aes(x=PC1, y=PC2)) +
   geom_text_repel(aes(label=ID), size =3, nudge_y = 0.03) 
   ggtitle("AVH.full")
   
-## example of how to add relelled text labels:
+## example of how to add repelled text labels:
 #library(ggrepel)
 #ggplot(mtcars, aes(wt, mpg, label = rownames(mtcars))) +
 #  geom_text_repel() +
@@ -69,18 +69,18 @@ ggplot(PC12.AVHLG.full, aes(x=PC1, y=PC2)) +
   ggtitle("AVHLG.full")
   
 
-#labelling code to check out:
-ggplot(tab, aes(x = EV2, y = EV1, col = pop)) +
-  geom_point(alpha = 0.5, size = 5) +
-  # geom_text(aes(label=sample.id), size =3, hjust = 0, nudge_x = 0.02) +
-  # geom_text(aes(label=sample.id), size =3, position=position_jitter(width=0.2,height=0,2)) +
-  geom_text_repel(aes(label=sample.id), size =3, nudge_y = 0.03) +
-  theme_bw()
+#labeling code to check out:
+#ggplot(tab, aes(x = EV2, y = EV1, col = pop)) +
+#  geom_point(alpha = 0.5, size = 5) +
+#  # geom_text(aes(label=sample.id), size =3, hjust = 0, nudge_x = 0.02) +
+#  # geom_text(aes(label=sample.id), size =3, position=position_jitter(width=0.2,height=0,2)) +
+#  geom_text_repel(aes(label=sample.id), size =3, nudge_y = 0.03) +
+#  theme_bw()
 ```
 
 
 
-#### Admixture plot of plate 2 alle, vill, and hybrids only
+### Admixture plot of plate 2 alle, vill, and hybrids only
 
 Plot created from output of the following code:\
 `NGSadmix -likes $IN_DIR/p2_AVH.genolike.beagle.gz -K 2 -P 48 -o $OUT_DIR/AVH_p2_NGSadmix_out -minMaf 0.05`

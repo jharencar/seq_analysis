@@ -14,11 +14,13 @@ python3 seq_gather.py
 
 sbatch dedup.slurm
 
-# Next, we clean/trim with trimmomatic_clean.sh, which removes adapters and reads less than 100bp (everything should be >150 based on size selection on the pooled libraries)
+# Next, we clean/trim with trimmomatic_clean.sh, which removes adapters and reads less than 100bp (everything should be >150 based on size selection on the pooled libraries; plates 1 and 2 need to be re-run as they did not get small read removal.)
 # We will have to change the paths (cd into directory with sequence files and call the python code from where it resides)
 # The cleaning should be done via sbatch on hummingbird
 # This script runs the cleaning in an array for more efficient processing
 # utilizes trimmomatic
+
+## trim bad quality bases here too! 
 
 sbatch trimmomatic_clean.sh
 
@@ -41,21 +43,59 @@ sbatch bwa_mapping_unpaired.sh
 
 sbatch bam_merge.slurm
 
-##### BELOW NEEDS DETAILS/FIXING?
+####DON'T DO THIS! It is weirdly inconsistant; need to go back and remove sml reads at fasta trimming stage with p1 and p2##########
+OR! there may be small reads that are mapping artifacts (would not disappear by filterint out small reads from fasta) -> if so can filter from the bams to get rid of them. (usually below a size threshold of 35, for ex)
 # Next we filter out reads of less than 100bp, as all reads really should be >150 after size selection. 
 # we use samtools view and awk to do this. 
 # again, the script lilkely needs to be edited based on bam naming conventions and location
 
 sbatch remove_small_reads.sh
+###############
 
 # Next we remove duplicates again, this time including optical duplicates (mapping to exact same coordinates).
 # Utilizes samtools sort/fixmate/markdups
 
 sbatch markdups_rm.sh
 
-# lastly, we can check out coverage with this array script.
+# merge reads for same individual with samtools merge
+
+merge_bams_per_individual.sh
+
+# we can check out coverage with this array script.
 # utilizes samtools depth and awk
 
-sbatch coverage_from_bams_array.sh
+sbatch coverage_from_bams_loop.sh
 
-############ 
+########## for generation of gVCFs with GATK ################
+# To use GATK, we need to assign readgroups. We will do this with Picard tools
+# Assign readgroups using picard tools to bams as required by GATK for vcf generation.
+
+## check what the default parameters of GATK are
+
+asgn_read_groups_p1.sh
+
+#index bams for GATK to run properly
+
+index_bams.sh
+
+# Use GATK4 HaplotypeCaller (which includes realignment of indels) to generate VCF. 
+
+GVCF_GATK_HaplotypeCaller.sh
+
+# Generate map file for running GenomicsDBImport
+
+Map_file_generation.sh
+
+# Merge gvcfs from multiple samples with GenomicsDBImport from GATK 
+
+GenomicsDBImport.sh
+
+# Perform joint genotype calling with GenotypeGVCFs from GATK
+
+GenotypeGVCFs.sh
+
+######### for filtering VCFs to contain shared sites between spp - Nicolas Alexandre code ##################
+
+
+
+

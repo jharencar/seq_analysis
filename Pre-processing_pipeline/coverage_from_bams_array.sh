@@ -1,15 +1,16 @@
 #!/bin/bash
 #SBATCH --partition 128x24   
+#SBATCH --mail-type=ALL              # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jharenca@ucsc.edu  # Where to send mail
 #SBATCH --job-name=bam_coverage # Job name
-#SBATCH --time=24:00:00
 #SBATCH --output=bam_coverage_.%A_%a.out
 #SBATCH -e bam_coverage_.%A_%a.err
+#SBATCH --ntasks=3
+##SBATCH --ntasks-per-node=20
 #SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=24
-#SBATCH --array=[1-156]%3  # []%3 limits it so only 3 run in parallel at once
+#SBATCH --cpus-per-task=1
+#SBATCH --array=[1-153]%60  # []%3 limits it so only 3 run in parallel at once
 #submit with SBATCH array, submit as normal or to specify certain array numbers: sbatch --array=x-y job_script.sbatch
-
 
 ## load samtools
 module load samtools/samtools-1.10
@@ -18,7 +19,7 @@ module load samtools/samtools-1.10
 cd /hb/scratch/jharenca/pop_gen/combinedP1P2/merged_bams
 
 # variable setting
-BAM_FILE=$(ls *.bam | sed -n ${SLURM_ARRAY_TASK_ID}p) # make list of file names to iterate through
+BAM_FILE=$(ls *clean.bam | sed -n ${SLURM_ARRAY_TASK_ID}p) # make list of file names to iterate through
 
 # EG: name pulls 19.572 and SPP pulls LAEV from: 19.572_LAEV_merged.bam
 SAMPLE_NAME=$(echo $BAM_FILE |cut  -d "_" -f 1 )
@@ -37,3 +38,4 @@ breadth=$(samtools depth -a ${BAM_FILE} | awk '{c++; if($3>0) total+=1}END{print
 echo "${SAMPLE_ID}, ${SAMPLE_SPP} $depth, $breadth" >> coverage_data.csv
 
 
+salloc --partition=128x24 --nodes=1 --exclusive=user
