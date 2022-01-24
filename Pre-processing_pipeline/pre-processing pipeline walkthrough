@@ -94,6 +94,25 @@ GenomicsDBImport.sh
 
 GenotypeGVCFs.sh
 
+######### steps to use Ancestry_HMM
+
+# some filtering/cleaning
+
+# --SnpGap 3: drop all snps within 3bp of indels (could be alignment error) 
+
+bcftools filter --SnpGap 3 --threads 12 -o scaf.vcf.gz -O z arabidopsis.rename.vcf.gz
+
+# keep only biallelic snps (-m2); -q alternate allele freq btw .05 and 0.95
+bcftools view -m2 -M2 -v snps -U --threads 12 -q .05 -Q .95 -o scaffold.vcf.gz -O z scaf.vcf.gz
+
+# to make the input panel for aHMM use the  script from Max Genetti
+
+aHMM_input_generation.sh
+
+# run aHMM - make sample file
+
+run_aHMM.sh
+
 ######### for filtering VCFs to contain shared sites between spp - Nicolas Alexandre code ##################
 
 
