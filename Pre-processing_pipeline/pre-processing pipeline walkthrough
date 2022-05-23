@@ -14,15 +14,17 @@ python3 seq_gather.py
 
 sbatch dedup.slurm
 
-# Next, we clean/trim with trimmomatic_clean.sh, which removes adapters and reads less than 100bp (everything should be >150 based on size selection on the pooled libraries; plates 1 and 2 need to be re-run as they did not get small read removal.)
+# Next, we clean/trim with trimmomatic_clean.sh, which removes adapters 
+## NOT DONE/DOING: and reads less than 100bp (everything should be >150 based on size selection on the pooled libraries; I changed my mind bout this being necessary becasue of the many layers of downstream filtering that will catch any reads that are not true reads from my individuals)
 # We will have to change the paths (cd into directory with sequence files and call the python code from where it resides)
 # The cleaning should be done via sbatch on hummingbird
 # This script runs the cleaning in an array for more efficient processing
 # utilizes trimmomatic
 
-## trim bad quality bases here too! 
 
 sbatch trimmomatic_clean.sh
+
+# confirm that most reads are paired; so far they have been - problem if not!
 
 # Now we are ready to map, and again this is done through an array script submitted through sbatch.
 # The bwa_mapping_paired.sh file needs the directory path updated to the folder with trimmed reads and an indexed reference genome and may also need edits to labels, like "library name"
@@ -44,11 +46,10 @@ sbatch bwa_mapping_unpaired.sh
 sbatch bam_merge.slurm
 
 ####DON'T DO THIS! It is weirdly inconsistant; need to go back and remove sml reads at fasta trimming stage with p1 and p2##########
-OR! there may be small reads that are mapping artifacts (would not disappear by filterint out small reads from fasta) -> if so can filter from the bams to get rid of them. (usually below a size threshold of 35, for ex)
+OR! there may be small reads that are mapping artifacts (would not disappear by filterint out small reads from fasta) -> if so can filter from the bams to get rid of them. (usually below a size threshold of 35, for ex) <-- THIS is what I want to do. 
 # Next we filter out reads of less than 100bp, as all reads really should be >150 after size selection. 
 # we use samtools view and awk to do this. 
 # again, the script lilkely needs to be edited based on bam naming conventions and location
-
 sbatch remove_small_reads.sh
 ###############
 
@@ -57,15 +58,107 @@ sbatch remove_small_reads.sh
 
 sbatch markdups_rm.sh
 
-# merge reads for same individual with samtools merge
+# merge reads for same individual with samtools merge (IMPORTANT to do this only AFTER the last purge dups, otherwise purge good reads)
 
 merge_bams_per_individual.sh
 
-# we can check out coverage with this array script.
+# there may be small reads that are mapping artifacts, next we filter those out with samtools (edited based on bam naming conventions and location); this filters out insert sizes of less than 35bp
+
+sbatch rm_sml_rds.sh
+
+# Next we filter out unmapped reads and reads with low mapping quality using samtools (unpaired reads can be easily removed with this script as well)
+
+sbatch bam_filter_q20.slurm
+
+# merging can also be done here after all the filtering, it makes sense to merge before coverage calculation so as to get an idea of per individual coverage
+
+
+###############
+# Now is when we calculate coverage:
+# we can check out coverage with this array script, or the loop version. 
 # utilizes samtools depth and awk
 
+coverage_from_bams_array.sh
 sbatch coverage_from_bams_loop.sh
 
+############### To generate VCFs with bcftools from clean bams: 
+
+# we use bcftools mpileup to generate VCFs
+# the key here is the bamlist, which (obviously) dictates which samples receive variant calling together. 
+# Samples can be filtered out of the VCFs later, but I am not sure what it does to include them vs not (ie, what is different if we run it on all vs just those above a coverage threshold?)
+
+sbatch initial_vcf_gen_loop.sh
+
+
+############### ANGSD
+
+# Before generating genotype likelihood files, we want to filter for sites that are generally shared across groupings (at least for things like PCAngsd and NGSAdmix, I am still unsure about doAbbababa).
+# we have some lovely code modified from Nicholas Alexandre to help us with this
+# IMPORTANT WARNING: This code ABSOLUTELY needs to be modified depending on what samples are in the vcf AND their order. See in code notes
+
+sbatch vcf_filtering_Nicolas.sh
+
+# the filtering code will give us a .sites file that we will then use with the -sites flag in ANGSD when generating the genotype likelihood beagles
+# when we run ANGSD, we run it directly on the .bams, and again, we will need to specify a bam.filelist based on what the downstream purpose of our .beagle will be. 
+
+# example
+sbatch AVH_selecet_sites_0.15co_ANDSG1.slurm 
+
+#eg: 
+angsd -GL 1 -out selected_sites_0.15co_AVH.genolike -sites Filtered.sites -nThreads 48 -doGlf 2 -doMajorMinor 1 -SNP_pval 1e-6 -doMaf 1 -minMapQ 30 -bam AVH_clean_211104.bam.filelist
+
+# From here, we can use the .beagle in either PCAngsd or NGSadmix, and maybe elsewhere...
+
+sbatch PCAngsd.sh #an example
+
+############### steps to use Ancestry_HMM
+
+# First, we use bcftools to do some basic cleaning and filtering of the vcf files that we will then use with aHMM
+# We drop all snps within 3bp of indels (could be alignment error), keep only biallelic snps (-m2), andkeep only snps with alternate allele freq btw .05 and 0.95 (I think...; '-q alternate allele freq btw .05 and 0.95')
+bcftools view -m2 -M2 -v snps -U --threads 12 -q .05 -Q .95 -o scaffold.vcf.gz -O z scaf.vcf.gz
+
+# Next, we make the input panel for aHMM use the python script from Max Genetti
+# that script is called vcf2aHMM.py and will need to be in the folder with the vcfs or get a path added in the script
+# we will also need a ahmm.pop file that specifies individuals from the VCF to be used as parental references and those that we are assessing as hybrids
+
+sbatch aHMM_input_generation.sh
+
+# run aHMM - make sample file
+# we will also need a aHMM_sample.info file that specifies the IDs of the individuals being assessed as hybrids and their ploidy
+# this code can wither be run on a single scaffold or set of scaffolds (in which case it needs to be re-written as a simple line not in a loop)
+# or it can be run on all scaffold sets, but for this we need to first generate separate folders for each scaffold set as the outputs will be named by the individual and have the same name for each scaffold. 
+# For the loop code to work, we need to put both the aHMM_sample.info file and the appropriate scaffold panel into each of the folders
+# generating the folders can be done with a simple loop like so:
+
+for i in {1..21}; do
+	mkdir scaff${i}_posteriors
+done
+
+# and moving the scaffold .panels can also be done with a simple loop:
+for i in {1..21}; do
+	cp scaff${i}.panel scaff${i}_posteriors
+done
+
+# then we can run the code as is with the loop
+sbatch run_aHMM.sh
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### old stuff not a part of my current analysis below ######
 ########## for generation of gVCFs with GATK ################
 # To use GATK, we need to assign readgroups. We will do this with Picard tools
 # Assign readgroups using picard tools to bams as required by GATK for vcf generation.
@@ -93,28 +186,4 @@ GenomicsDBImport.sh
 # Perform joint genotype calling with GenotypeGVCFs from GATK
 
 GenotypeGVCFs.sh
-
-######### steps to use Ancestry_HMM
-
-# some filtering/cleaning
-
-# --SnpGap 3: drop all snps within 3bp of indels (could be alignment error) 
-
-bcftools filter --SnpGap 3 --threads 12 -o scaf.vcf.gz -O z arabidopsis.rename.vcf.gz
-
-# keep only biallelic snps (-m2); -q alternate allele freq btw .05 and 0.95
-bcftools view -m2 -M2 -v snps -U --threads 12 -q .05 -Q .95 -o scaffold.vcf.gz -O z scaf.vcf.gz
-
-# to make the input panel for aHMM use the  script from Max Genetti
-
-aHMM_input_generation.sh
-
-# run aHMM - make sample file
-
-run_aHMM.sh
-
-######### for filtering VCFs to contain shared sites between spp - Nicolas Alexandre code ##################
-
-
-
 

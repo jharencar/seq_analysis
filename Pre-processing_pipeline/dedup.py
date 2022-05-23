@@ -24,4 +24,3 @@ for sample in samples:
     output, error = process.communicate()
         
 print("done └(^o^ )┘")
-
