@@ -6,4 +6,9 @@ angsd -GL 1 -out genolike -nThreads 144 -doGlf 2 -doMajorMinor 1 -SNP_pval 1e-6 
 	AVH: Total number of sites analyzed: 1201995775; Number of sites retained after filtering: 23199178
 	AVHLG: Total number of sites analyzed: 1227164262; Number of sites retained after filtering: 38351271
 
+ANGSD1 - selected sites
+angsd -GL 1 -out selected_sites_0.15co_AVH.genolike -sites Filtered.sites -nThreads 48 -doGlf 2 -doMajorMinor 1 -SNP_pval 1e-6 -doMaf 1 -minMapQ 30 -bam AVH_clean_211104.bam.filelist
+
+	AVH: Total number of sites analyzed: 137318; Number of sites retained after MAF filtering (0.05): 103438
+
 ANGSD2

@@ -21,7 +21,6 @@ sbatch dedup.slurm
 # This script runs the cleaning in an array for more efficient processing
 # utilizes trimmomatic
 
-
 sbatch trimmomatic_clean.sh
 
 # confirm that most reads are paired; so far they have been - problem if not!
@@ -38,12 +37,20 @@ sbatch bwa_mapping_paired.sh
 
 sbatch bwa_mapping_unpaired.sh
 
-# next we merge the bams with samtools using the bam_merge.slurm script
+# next we merge theed and unpaird bams with samtools using the bam_merge.slurm script
 # remember to change the stated directory to the one containing all the .bam files and change the run name if needed. 
 # Note: there is a commented option for running as an array 
 # utilizes samtools merge
 
 sbatch bam_merge.slurm
+
+###############
+# Now is when we calculate coverage:
+# we can check out coverage with this array script, or the loop version. 
+# utilizes samtools depth and awk
+
+coverage_from_bams_array.sh
+sbatch coverage_from_bams_loop.sh
 
 ####DON'T DO THIS! It is weirdly inconsistant; need to go back and remove sml reads at fasta trimming stage with p1 and p2##########
 OR! there may be small reads that are mapping artifacts (would not disappear by filterint out small reads from fasta) -> if so can filter from the bams to get rid of them. (usually below a size threshold of 35, for ex) <-- THIS is what I want to do. 
@@ -58,6 +65,10 @@ sbatch remove_small_reads.sh
 
 sbatch markdups_rm.sh
 
+### ADD SORT BAMS!!!! ###
+samtools sort -o in.bam
+######
+
 # merge reads for same individual with samtools merge (IMPORTANT to do this only AFTER the last purge dups, otherwise purge good reads)
 
 merge_bams_per_individual.sh
@@ -71,15 +82,6 @@ sbatch rm_sml_rds.sh
 sbatch bam_filter_q20.slurm
 
 # merging can also be done here after all the filtering, it makes sense to merge before coverage calculation so as to get an idea of per individual coverage
-
-
-###############
-# Now is when we calculate coverage:
-# we can check out coverage with this array script, or the loop version. 
-# utilizes samtools depth and awk
-
-coverage_from_bams_array.sh
-sbatch coverage_from_bams_loop.sh
 
 ############### To generate VCFs with bcftools from clean bams: 
 

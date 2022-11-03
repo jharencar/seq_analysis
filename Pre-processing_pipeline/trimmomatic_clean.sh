@@ -1,14 +1,15 @@
 #!/bin/bash
 #SBATCH --job-name=trimmomatic # Job name
 #SBATCH --time=3-12:00:00
-#SBATCH --output=trimmomatic_output.txt
+#SBATCH --output=trimmomatic.out
+#SBATCH -e trimmomatic.err
 #SBATCH --mail-type=END,FAIL              # Mail events (NONE, BEGIN, END, FAIL, ALL)
 #SBATCH --mail-user=jharenca@ucsc.edu  # Where to send mail
 #SBATCH -p 128x24   # Partition name
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
-#SBATCH --array=[1-96]%3 # []%3 limits it so only 3 run in parallel at once
+#SBATCH --array=[1-96] # []%3 limits it so only 3 run in parallel at once
 #submit with SBATCH array, submit as normal or to specify certain array numbers: sbatch --array=x-y job_script.sbatch
 
 #### Trimmomatic trimming and cleaning code for Tn5 LCWG illumina HiSeq data ####
@@ -70,7 +71,7 @@ echo "done!  └(^o^ )┘"
 # below is what I feel like I should maybe do, but probably not necessary/won't change anything/wait for a reviewr to complain. 
 # My data makses sense and I have lots of other ways the data is filtered in downstream analysis.
 # it includes base quality filtering and removal of reads less than 100bp
-# slidingwindow: takes average quality score across sliding window of 4pb and drops the end of the read once it is below 20bp
+# slidingwindow: takes average quality score across sliding window of 4pb and drops the end of the read once it is below 20 quality
 # Minlen: drop read if it is below a specific length 
 #NOTE, NexteraPE-PE.fa needs full path or to be moved into file with fastqs
 
@@ -78,7 +79,7 @@ echo "done!  └(^o^ )┘"
 java -jar /hb/software/apps/trimmomatic/gnu-0.39/trimmomatic-0.39.jar PE -threads 48 ${R1} ${R2} \
 	${SAMPLE_NAME}_F_paired.fq.gz ${SAMPLE_NAME}_F_unpaired.fq.gz \
 	${SAMPLE_NAME}_R_paired.fq.gz ${SAMPLE_NAME}_R_unpaired.fq.gz \
-	SLIDINGWINDOW:4:20 MINLEN:100 ILLUMINACLIP:NexteraPE-PE.fa:2:30:10:1:keepBothReads LEADING:3 TRAILING:3 MINLEN:100
+	SLIDINGWINDOW:4:20 ILLUMINACLIP:NexteraPE-PE.fa:2:30:10:1:keepBothReads LEADING:3 TRAILING:3 MINLEN:100
 
 
 
