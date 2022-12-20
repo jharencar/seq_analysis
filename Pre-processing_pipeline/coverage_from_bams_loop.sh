@@ -27,4 +27,3 @@ for BAM_NAME in $BAM_LIST; do
         breadth=$(samtools depth -a ${BAM_NAME} | awk '{c++; if($3>0) total+=1}END{print (total/c)*100}')
         echo "${BAM_NAME}, $depth, $breadth" >> coverage_data.txt
 done
-

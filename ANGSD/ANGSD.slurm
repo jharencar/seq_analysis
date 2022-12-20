@@ -17,10 +17,9 @@ cd /hb/scratch/jharenca/vill_alle_plate1/newdata/whole_plate_mapping/ANGSD
 
 
 # helpful summary of some of the main diffs between GATK and samtools: https://www.biostars.org/p/57149/
-# Sounds like samtools is what I want as GATK is optimized for human genomics and I will want to manually set filters (I don't have piles of data to train GATK with to infer filters)
 # (I am very unsure about the SNP_pval param. ask Merly or Molly or...) 
 # to generate beagle files for NGSadmix and PCAngsd. 
-echo "angsd -GL 1 -out genolike -nThreads 24 -doGlf 2 -doMajorMinor 1 -SNP_pval 1e-6 -doMaf 1  -bam bam.filelist"
+echo "angsd -GL 1 -out genolike -sites -nThreads 24 -doGlf 2 -doMajorMinor 1 -SNP_pval 1e-6 -doMaf 1  -bam bam.filelist"
 angsd -GL 1 \ # -GL: Estimate genotype likelihoods. Options - 1: SAMtools 2: GATK 3: SOAPsnp 4: SYK
 -out genolike \ # file output type
 -nThreads 144 \

@@ -16,10 +16,10 @@
 module load samtools/samtools-1.10
 
 ## change into the directory with .bams
-cd /hb/scratch/jharenca/pop_gen/combinedP1P2/merged_bams
+cd /hb/home/jharenca/pop_gen/cleaned_bams/q20co_sml_rds_rmed/
 
 # variable setting
-BAM_FILE=$(ls *clean.bam | sed -n ${SLURM_ARRAY_TASK_ID}p) # make list of file names to iterate through
+BAM_FILE=$(ls *q20co.bam | sed -n ${SLURM_ARRAY_TASK_ID}p) # make list of file names to iterate through
 
 # EG: name pulls 19.572 and SPP pulls LAEV from: 19.572_LAEV_merged.bam
 SAMPLE_NAME=$(echo $BAM_FILE |cut  -d "_" -f 1 )

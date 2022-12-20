@@ -2,7 +2,7 @@
 
 #This begins with merged bams (merge the 2 unpaired and one paired bam per sample from the bwa mapping)
 
-#First create a list of the bams to be included in the run for example:
+#First create a list of the bams to be included in the run, for example:
 
 ls -d /hb/scratch/jharenca/vill_alle_plate1/newdata/AVH_plate2/angsd_in/*VILL* /hb/scratch/jharenca/vill_alle_plate1/newdata/AVH_plate2/angsd_in/*ALLE* /hb/scratch/jharenca/vill_alle_plate1/newdata/AVH_plate2/angsd_in/*HYB* > AVH_p2_bam.filelist
 
@@ -19,6 +19,7 @@ PCAngsd_AVH_p2.slurm
 # to generate the population label file from the bam list (first part only necessary if bamlist has absolute paths)
 
 cut -d "/" -f 9 AVH_only.clean.bam.filelist | cut -d "_" -f 1,2 > AVH_only.clean.pop.info
+cut -d "/" -f 9 AVH_clean_211104.bam.filelist | cut -d "_" -f 1,2 > AVH_clean_211104.pop.info
 
 # This file then needs to have the name (e.g. 19.588_VILL) split into two columns in the pop.info sheet. Can simply do this by converting the "_" to a " " (the -i flag makes this change immediately)
 
