@@ -1,0 +1,7 @@
+PCAngsd plan:
+
+first pass:
+include all HYBS, ALLE, VILL, LAEV, and GUAN with coverage >= 0.01
+
+Second pass:
+include all HYBS, ALLE, VILL that do NOT appear to have any LAEV or GUAN admixture from previous PCA
