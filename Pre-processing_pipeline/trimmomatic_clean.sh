@@ -9,7 +9,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
-#SBATCH --array=[1-96] # []%3 limits it so only 3 run in parallel at once
+#SBATCH --array=1-96 
 #submit with SBATCH array, submit as normal or to specify certain array numbers: sbatch --array=x-y job_script.sbatch
 
 #### Trimmomatic trimming and cleaning code for Tn5 LCWG illumina HiSeq data ####
@@ -75,11 +75,11 @@ echo "done!  └(^o^ )┘"
 # Minlen: drop read if it is below a specific length 
 #NOTE, NexteraPE-PE.fa needs full path or to be moved into file with fastqs
 
-# NOT part of the below code but can be done with trimmomatic; from lcwgs for beginners, "A conservative approach is to soft-clip one of the overlapping read ends."
-java -jar /hb/software/apps/trimmomatic/gnu-0.39/trimmomatic-0.39.jar PE -threads 48 ${R1} ${R2} \
-	${SAMPLE_NAME}_F_paired.fq.gz ${SAMPLE_NAME}_F_unpaired.fq.gz \
-	${SAMPLE_NAME}_R_paired.fq.gz ${SAMPLE_NAME}_R_unpaired.fq.gz \
-	SLIDINGWINDOW:4:20 ILLUMINACLIP:NexteraPE-PE.fa:2:30:10:1:keepBothReads LEADING:3 TRAILING:3 MINLEN:100
+## NOT part of the below code but can be done with trimmomatic; from lcwgs for beginners, "A conservative approach is to soft-clip one of the overlapping read ends."
+#java -jar /hb/software/apps/trimmomatic/gnu-0.39/trimmomatic-0.39.jar PE -threads 48 ${R1} ${R2} \
+#	${SAMPLE_NAME}_F_paired.fq.gz ${SAMPLE_NAME}_F_unpaired.fq.gz \
+#	${SAMPLE_NAME}_R_paired.fq.gz ${SAMPLE_NAME}_R_unpaired.fq.gz \
+#	SLIDINGWINDOW:4:20 ILLUMINACLIP:NexteraPE-PE.fa:2:30:10:1:keepBothReads LEADING:3 TRAILING:3 MINLEN:100
 
 
 
